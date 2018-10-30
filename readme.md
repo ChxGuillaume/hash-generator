@@ -1,15 +1,13 @@
 # Hashs (sha256) Generator
 
-Regular Script launch
-```
-node app
-```
+### Install the dependencies
 
-Default Parameters launch
-```
-node app -d
-```
-or
-```
-node app --default
-```
+> node install
+
+
+### Run the Script
+
+| Start Command | Description |
+| - | - |
+| node app | Default Start command (you choose the parameters) |
+| node app -d | Start command with default Parameters |
