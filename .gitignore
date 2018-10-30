@@ -1,0 +1,6 @@
+# Node Modules (Reinstall with npm install)
+node_modules
+
+# Generated Files by Program
+*.txt
+test.js
