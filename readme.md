@@ -1,4 +1,4 @@
-# Hashs (sha256) Generator
+# Hashs Generator
 
 ### Install the dependencies
 

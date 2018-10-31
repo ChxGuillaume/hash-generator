@@ -1,7 +1,21 @@
 var fs = require("fs");
-var sha256 = require("sha256");
 var readline = require("readline");
 var colors = require("colors");
+var shajs = require('sha.js');
+var md5 = require('md5.js');
+
+var HashFuncList = {
+    "md5": md5,
+    "sha1": shajs,
+    "sha224": shajs,
+    "sha256": shajs,
+    "sha384": shajs,
+    "sha512": shajs,
+};
+var selectedHashFunc = {
+    "name": "sha256",
+    "func": HashFuncList.sha256
+};
 
 var rl = readline.createInterface(process.stdin, process.stdout, null);
 var nPasswordPerSize = 10;
@@ -9,7 +23,27 @@ var nMinPasswordSize = 4;
 var nPasswordSize = 25;
 
 if (process.argv[2] === "--default" || process.argv[2] === "-d") startGeneration();
-else nPasswordPerSizeQuestion();
+else hashFuncQuestion();
+
+function hashFuncQuestion() {
+    console.log("\n");
+
+    var ListAlgos = "";
+    Object.keys(HashFuncList).forEach(e => {
+        ListAlgos += "- " + e.yellow + "\n";
+    });
+
+    rl.question("Choose a Hash Algorithm: ".blue + "(default sha256) \n".yellow + ListAlgos, (answer) => {
+        if (Object.keys(HashFuncList).indexOf(answer) === -1) console.log("Invalid Hash Algorithm, keeping default one. ".magenta + "(sha256) ".yellow);
+        else {
+            selectedHashFunc.name = answer;
+            selectedHashFunc.func = HashFuncList[answer];
+            console.log("The Hash Algorithm is now: ".green + answer.yellow);
+        }
+
+        nPasswordPerSizeQuestion();
+    });
+}
 
 function nPasswordPerSizeQuestion() {
     console.log("\n");
@@ -66,7 +100,7 @@ function startGeneration() {
         NUMBER: "0123456789",
         SPECIALCHAR: "&é\"'(-è_çà)=°+^$ù*¨£%µ¤,;:!?./§<>²"
     }
-    
+
     var GenerationTypes = {
         SimplePasswords: {
             GenericName: "passwords-simple.txt",
@@ -97,9 +131,15 @@ function startGeneration() {
                     password += EType.UsedChars[Math.floor(Math.random() * EType.UsedChars.length)];
                 }
 
-                var hashed_password = sha256(password);
+                var hashed_password;
+                if (selectedHashFunc.name === "md5") {
+                    hashed_password = new md5().update(password).digest('hex')
+                } else {
+                    hashed_password = selectedHashFunc.func(selectedHashFunc.name).update(password).digest('hex')
+                }
+
                 GenericFile += password + " : " + hashed_password;
-                HashsFile += sha256(password);
+                HashsFile += hashed_password;
 
                 GenericFile += "\n";
                 HashsFile += "\n";
